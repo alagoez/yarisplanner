@@ -1,0 +1,78 @@
+@import "tailwindcss";
+@import "@fontsource-variable/fraunces";
+
+/* Renkler gönderilen tasarımdaki pudra-gül tonlarından alındı. */
+:root {
+  --bg: #f7eeec;
+  --surface: #fffbfa;
+  --surface-2: #f3e4e3;
+  --fg: #3e2328;
+  --muted: #8a6e72;
+  --accent: #a65666;
+  --accent-fg: #ffffff;
+  --line: #ebdcdb;
+  --shadow: rgb(120 60 70 / 0.18);
+  --danger: #b3261e;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1b1315;
+    --surface: #261b1e;
+    --surface-2: #33242a;
+    --fg: #f3e6e8;
+    --muted: #b79ca2;
+    --accent: #e19aa7;
+    --accent-fg: #2a1519;
+    --line: #3b2a2f;
+    --shadow: rgb(0 0 0 / 0.5);
+    --danger: #f2b8b5;
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-line: var(--line);
+  --color-danger: var(--danger);
+  --font-display: "Fraunces Variable", Georgia, "Times New Roman", serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+}
+
+@utility card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  box-shadow: 0 10px 24px -18px var(--shadow);
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}

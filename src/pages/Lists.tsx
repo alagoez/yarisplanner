@@ -1,7 +1,7 @@
 import { Link } from 'react-router'
 import HandIcon, { type IconName } from '../components/HandIcon'
 import PageHeader from '../components/PageHeader'
-import { Art, CardHeading, Muted, SeeAll, Timeline, TimelineRow, Twinkle } from '../components/ui'
+import { Art, CardHeading, EditTitle, Muted, SeeAll, Timeline, TimelineRow, Twinkle } from '../components/ui'
 import { useExtras } from '../lib/demo'
 import { formatLong, formatShort, hasTime, splitRoute, upcoming, useItems } from '../lib/items'
 import { useNow } from '../lib/useNow'
@@ -41,7 +41,7 @@ export default function Lists() {
             {care.map((item, i) => (
               <TimelineRow key={item.id} last={i === care.length - 1}>
                 <span className="w-[132px] shrink-0 text-[16px]">{formatShort(item)}</span>
-                <span className="truncate text-[16px] text-fg/85">{item.title}</span>
+                <EditTitle item={item} className="truncate text-[16px] text-fg/85" />
               </TimelineRow>
             ))}
           </Timeline>
@@ -59,7 +59,7 @@ export default function Lists() {
             <div className="flex flex-col gap-1">
               <span className="flex items-center gap-2 text-[19px]">
                 <HandIcon name="plane" size={22} />
-                {route.to ? `${route.from} → ${route.to}` : route.from}
+                <EditTitle item={trip}>{route.to ? `${route.from} → ${route.to}` : route.from}</EditTitle>
               </span>
               <span className="flex items-center gap-2 text-[16px] text-fg/80">
                 <HandIcon name="calendar" size={22} />

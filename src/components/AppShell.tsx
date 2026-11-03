@@ -1,7 +1,7 @@
 import { NavLink, Outlet } from 'react-router'
 import { ItemsProvider } from '../lib/items-provider'
 import HandIcon, { type IconName } from './HandIcon'
-import QuickAdd from './QuickAdd'
+import EditorProvider from './QuickAdd'
 
 const TABS: { to: string; label: string; icon: IconName }[] = [
   { to: '/', label: 'Ana Sayfa', icon: 'home' },
@@ -14,6 +14,7 @@ const TABS: { to: string; label: string; icon: IconName }[] = [
 export default function AppShell() {
   return (
     <ItemsProvider>
+    <EditorProvider>
     <div className="min-h-dvh overflow-x-clip bg-bg text-fg">
       <main className="mx-auto flex max-w-xl flex-col gap-3.5 px-4 [&_.grid>*]:min-w-0 pt-[calc(env(safe-area-inset-top)+12px)] pb-[calc(env(safe-area-inset-bottom)+108px)]">
         <Outlet />
@@ -39,8 +40,8 @@ export default function AppShell() {
           ))}
         </ul>
       </nav>
-      <QuickAdd />
     </div>
+    </EditorProvider>
     </ItemsProvider>
   )
 }

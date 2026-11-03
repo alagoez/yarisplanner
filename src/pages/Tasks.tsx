@@ -2,6 +2,7 @@ import { useState } from 'react'
 import HandIcon from '../components/HandIcon'
 import PageHeader from '../components/PageHeader'
 import { CheckBox, Muted, Twinkle } from '../components/ui'
+import { useEditor } from '../lib/editor'
 import { addDays } from '../lib/dates'
 import { formatShort, isDone, startOf, useItems, type Item } from '../lib/items'
 import { useNow } from '../lib/useNow'
@@ -18,10 +19,10 @@ const VIEWS: { key: View; label: string; empty: string }[] = [
 const REPEAT_LABEL = { gunluk: 'her gün', haftalik: 'her hafta', aylik: 'her ay', yillik: 'her yıl' }
 
 export default function Tasks() {
-  const { items, toggleDone, remove } = useItems()
+  const { items, toggleDone } = useItems()
+  const { open } = useEditor()
   const now = useNow()
   const [view, setView] = useState<View>('bugun')
-  const [confirming, setConfirming] = useState<string | null>(null)
 
   const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate())
   const startTomorrow = addDays(startToday, 1)
@@ -70,28 +71,17 @@ export default function Tasks() {
             {shown.map((item) => (
               <li key={item.id} className="flex items-center gap-3 px-2 py-2.5">
                 <CheckBox checked={isDone(item)} label={item.title} onToggle={() => toggleDone(item.id)} />
-                <div className="flex min-w-0 flex-1 flex-col leading-tight">
+                <button type="button" onClick={() => open(item)} className="flex min-w-0 flex-1 flex-col text-left leading-tight">
                   <span className={`text-[17px] ${isDone(item) ? 'text-muted line-through' : ''}`}>{item.title}</span>
                   <span className="flex flex-wrap items-center gap-x-2 text-[14px] text-fg/65">
                     {formatShort(item)}
                     {item.repeat && <span>· {REPEAT_LABEL[item.repeat]}</span>}
                     {item.reminders.length > 0 && !isDone(item) && <HandIcon name="bell" size={15} className="text-accent-strong" />}
                   </span>
-                </div>
-                {confirming === item.id ? (
-                  <span className="flex shrink-0 gap-1.5">
-                    <button type="button" onClick={() => remove(item.id)} className="rounded-full bg-danger px-3 py-1 text-[15px] text-white">
-                      Sil
-                    </button>
-                    <button type="button" onClick={() => setConfirming(null)} className="rounded-full border border-line px-3 py-1 text-[15px]">
-                      Vazgeç
-                    </button>
-                  </span>
-                ) : (
-                  <button type="button" onClick={() => setConfirming(item.id)} aria-label={`${item.title} kaydını sil`} className="shrink-0 px-1 text-[15px] text-fg/50">
-                    Sil
-                  </button>
-                )}
+                </button>
+                <button type="button" onClick={() => open(item)} aria-label={`${item.title} kaydını düzenle`} className="shrink-0 p-1 text-fg/55">
+                  <HandIcon name="pencil" size={20} fill={false} />
+                </button>
               </li>
             ))}
           </ul>

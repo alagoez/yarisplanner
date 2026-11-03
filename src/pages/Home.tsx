@@ -3,7 +3,7 @@ import { Link } from 'react-router'
 import HandIcon, { type IconName } from '../components/HandIcon'
 import NotificationCard from '../components/NotificationCard'
 import PageHeader from '../components/PageHeader'
-import { Art, CardHeading, CheckBox, IconChip, Muted, SeeAll, Timeline, TimelineRow, Twinkle } from '../components/ui'
+import { Art, CardHeading, CheckBox, EditTitle, IconChip, Muted, SeeAll, Timeline, TimelineRow, Twinkle } from '../components/ui'
 import WeekStrip from '../components/WeekStrip'
 import { firstName, useAuth } from '../lib/auth-context'
 import { greeting } from '../lib/dates'
@@ -69,7 +69,7 @@ export default function Home() {
               {schedule.slice(0, 3).map((item, i) => (
                 <TimelineRow key={item.id} last={i === Math.min(schedule.length, 3) - 1}>
                   <span className="w-[36px] shrink-0 text-[14.5px]">{formatTime(item)}</span>
-                  <span className="text-[14.5px] leading-tight">{item.title}</span>
+                  <EditTitle item={item} className="text-[14.5px] leading-tight" />
                 </TimelineRow>
               ))}
             </Timeline>
@@ -88,7 +88,7 @@ export default function Home() {
               {tasks.map((task) => (
                 <li key={task.id} className="flex items-start gap-2 text-[15px] leading-tight">
                   <CheckBox checked={isDone(task)} label={task.title} onToggle={() => toggleDone(task.id)} />
-                  <span className={isDone(task) ? 'text-muted line-through' : ''}>{task.title}</span>
+                  <EditTitle item={task} className={isDone(task) ? 'text-muted line-through' : ''} />
                 </li>
               ))}
             </ul>
@@ -123,7 +123,7 @@ export default function Home() {
               {care.map((item) => (
                 <li key={item.id} className="flex items-center gap-2 text-[15px] text-fg">
                   <CheckBox checked={isDone(item)} label={item.title} onToggle={() => toggleDone(item.id)} />
-                  <span className={isDone(item) ? 'text-muted line-through' : ''}>{item.title}</span>
+                  <EditTitle item={item} className={isDone(item) ? 'text-muted line-through' : ''} />
                 </li>
               ))}
             </ul>
@@ -133,13 +133,13 @@ export default function Home() {
         </Tile>
         <Tile to="/listeler/seyahat" icon="plane" title="Seyahat" subtitle="Yaklaşan seyahatin" art="plane" artHeight={60}>
           {trip ? (
-            <div className="relative mt-3 flex items-center gap-2 rounded-[14px] border border-line bg-white/80 px-2.5 py-2">
+            <EditTitle item={trip} className="mt-3 flex w-full items-center gap-2 rounded-[14px] border border-line bg-white/80 px-2.5 py-2">
               <HandIcon name="plane" size={22} />
-              <div className="flex flex-col leading-tight text-fg">
+              <span className="flex flex-col leading-tight text-fg">
                 <span className="text-[16px]">{splitRoute(trip.title).to ? `${splitRoute(trip.title).from} → ${splitRoute(trip.title).to}` : trip.title}</span>
                 <span className="text-[13.5px] text-fg/70">{formatLong(trip)}</span>
-              </div>
-            </div>
+              </span>
+            </EditTitle>
           ) : (
             <p className="mt-2 text-[15px] text-muted">Planlanmış seyahat yok.</p>
           )}

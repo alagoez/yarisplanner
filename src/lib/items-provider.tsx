@@ -45,6 +45,24 @@ export function ItemsProvider({ children }: { children: ReactNode }) {
     await load()
   }
 
+  /** Kaydı değiştirir; hatırlatmalar yeniden kurulur, böylece yeni zamana göre tekrar gönderilir. */
+  async function update(id: string, input: NewItem) {
+    const { reminders, ...fields } = input
+    if (IS_DEMO || !supabase) {
+      setItems((prev) => prev.map((i) => (i.id === id ? { ...i, ...fields, reminders: reminders.map((m) => ({ offset_minutes: m })) } : i)))
+      return
+    }
+    const { error } = await supabase.from('items').update(fields).eq('id', id)
+    if (error) throw error
+    const { error: deleteError } = await supabase.from('reminders').delete().eq('item_id', id)
+    if (deleteError) throw deleteError
+    if (reminders.length > 0) {
+      const { error: insertError } = await supabase.from('reminders').insert(reminders.map((m) => ({ item_id: id, offset_minutes: m })))
+      if (insertError) throw insertError
+    }
+    await load()
+  }
+
   async function toggleDone(id: string) {
     const item = items.find((i) => i.id === id)
     if (!item) return
@@ -69,5 +87,5 @@ export function ItemsProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  return <ItemsContext value={{ items, loading, error, add, toggleDone, remove }}>{children}</ItemsContext>
+  return <ItemsContext value={{ items, loading, error, add, update, toggleDone, remove }}>{children}</ItemsContext>
 }

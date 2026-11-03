@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import HandIcon, { type IconName } from '../components/HandIcon'
 import PageHeader from '../components/PageHeader'
-import { Art, CardHeading, CheckBox, Muted, Twinkle } from '../components/ui'
+import { Art, CardHeading, CheckBox, EditTitle, Muted, Twinkle } from '../components/ui'
 import { addDays, DAY_SHORT, formatDayTitle, formatMonthYear, isSameDay, weekOf } from '../lib/dates'
 import { useExtras, type Tag } from '../lib/demo'
 import { formatLong, formatTime, hasTime, isDone, isTask, onDay, upcoming, useItems, type Item } from '../lib/items'
@@ -140,7 +140,7 @@ export default function Calendar() {
                   </span>
                   {(item.module === 'is' || item.module === 'okul') && <TagChip tag={item.module} />}
                   <div className="flex min-w-0 flex-col leading-tight">
-                    <span className={`truncate text-[16px] ${isDone(item) ? 'text-muted line-through' : ''}`}>{item.title}</span>
+                    <EditTitle item={item} className={`truncate text-[16px] ${isDone(item) ? 'text-muted line-through' : ''}`} />
                     {item.notes && <span className="truncate text-[13.5px] text-fg/65">{item.notes}</span>}
                   </div>
                 </div>
@@ -161,7 +161,7 @@ export default function Calendar() {
                   <li key={exam.id} className="flex items-start gap-2 leading-tight">
                     <HandIcon name="calendar" size={20} className="shrink-0" />
                     <div className="flex flex-col">
-                      <span className="text-[15px]">{exam.title}</span>
+                      <EditTitle item={exam} className="text-[15px]" />
                       <span className="text-[13.5px] text-fg/65">{formatLong(exam)}</span>
                     </div>
                   </li>
@@ -254,7 +254,7 @@ function Checklist({ items, onToggle, note, empty }: { items: Item[]; onToggle: 
         <li key={item.id} className="flex items-start gap-2 leading-tight">
           <CheckBox checked={isDone(item)} label={item.title} onToggle={() => onToggle(item.id)} />
           <div className="flex flex-col">
-            <span className={`text-[15px] ${isDone(item) ? 'text-muted line-through' : ''}`}>{item.title}</span>
+            <EditTitle item={item} className={`text-[15px] ${isDone(item) ? 'text-muted line-through' : ''}`} />
             {note?.(item) && <span className="text-[13px] text-fg/65">{note(item)}</span>}
           </div>
         </li>

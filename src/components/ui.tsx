@@ -1,5 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react'
 import { Link } from 'react-router'
+import { useEditor } from '../lib/editor'
+import type { Item } from '../lib/items'
 import HandIcon, { type IconName } from './HandIcon'
 
 type Tone = 'rose' | 'lavender'
@@ -73,6 +75,16 @@ export function Muted({ children }: { children: ReactNode }) {
 /** Sayfa ve kartlardaki el çizimi illüstrasyon (public/art). */
 export function Art({ name, className, style }: { name: string; className?: string; style?: CSSProperties }) {
   return <img src={`/art/${name}.svg`} alt="" draggable={false} style={style} className={`pointer-events-none select-none ${className ?? ''}`} />
+}
+
+/** Kaydın başlığı; dokununca düzenleme sayfası açılır. */
+export function EditTitle({ item, className, children }: { item: Item; className?: string; children?: ReactNode }) {
+  const { open } = useEditor()
+  return (
+    <button type="button" onClick={() => open(item)} className={`text-left ${className ?? ''}`}>
+      {children ?? item.title}
+    </button>
+  )
 }
 
 /** Metin içinde ✨ yerine kullanılan küçük el çizimi yıldızlar. */

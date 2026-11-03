@@ -33,6 +33,7 @@ export type ItemsState = {
   loading: boolean
   error: string
   add: (item: NewItem) => Promise<void>
+  update: (id: string, item: NewItem) => Promise<void>
   toggleDone: (id: string) => Promise<void>
   remove: (id: string) => Promise<void>
 }
@@ -42,6 +43,7 @@ export const ItemsContext = createContext<ItemsState>({
   loading: true,
   error: '',
   add: async () => {},
+  update: async () => {},
   toggleDone: async () => {},
   remove: async () => {},
 })

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
-import { useItems, type Kind, type Module, type Repeat } from '../lib/items'
+import { EditorContext } from '../lib/editor'
+import { hasTime, useItems, type Item, type Kind, type Module, type Repeat } from '../lib/items'
 import { getPushState } from '../lib/push'
 import HandIcon from './HandIcon'
 
@@ -40,50 +41,54 @@ const REPEATS: { repeat: Repeat | null; label: string }[] = [
 ]
 
 const pad = (n: number) => String(n).padStart(2, '0')
-const todayValue = () => {
-  const d = new Date()
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
-}
+const dateValue = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+const timeValue = (d: Date) => `${pad(d.getHours())}:${pad(d.getMinutes())}`
 
-/** Sağ alttaki + düğmesi ve açılan hızlı ekleme sayfası. */
-export default function QuickAdd() {
-  const [open, setOpen] = useState(false)
+/**
+ * Sağ alttaki + düğmesi ve kayıt sayfası. Çocuklarına useEditor().open(kayıt) verir:
+ * kayıtla açılırsa düzenleme, kayıtsız açılırsa yeni kayıt.
+ */
+export default function EditorProvider({ children }: { children: ReactNode }) {
+  const [editing, setEditing] = useState<Item | 'new' | null>(null)
   return (
-    <>
+    <EditorContext value={{ open: (item) => setEditing(item ?? 'new') }}>
+      {children}
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={() => setEditing('new')}
         aria-label="Yeni kayıt ekle"
         className="fixed right-4 bottom-[calc(env(safe-area-inset-bottom)+92px)] z-20 grid size-14 place-items-center rounded-full border-[1.5px] border-fg/70 bg-accent text-accent-fg shadow-[0_10px_24px_-10px_var(--accent)]"
       >
         <HandIcon name="plus" size={30} strokeWidth={2.2} fill={false} />
       </button>
-      {open && <Sheet onClose={() => setOpen(false)} />}
-    </>
+      {editing && <Sheet key={editing === 'new' ? 'new' : editing.id} item={editing === 'new' ? undefined : editing} onClose={() => setEditing(null)} />}
+    </EditorContext>
   )
 }
 
-function Sheet({ onClose }: { onClose: () => void }) {
-  const { add } = useItems()
+function Sheet({ item, onClose }: { item?: Item; onClose: () => void }) {
+  const { add, update, remove } = useItems()
   const titleRef = useRef<HTMLInputElement>(null)
-  const [title, setTitle] = useState('')
-  const [kind, setKind] = useState<Kind>('gorev')
-  const [module, setModule] = useState<Module>('genel')
-  const [date, setDate] = useState(todayValue())
-  const [time, setTime] = useState('')
-  const [reminders, setReminders] = useState<number[]>([0])
-  const [repeat, setRepeat] = useState<Repeat | null>(null)
+  const start = item?.starts_at ? new Date(item.starts_at) : null
+  const [title, setTitle] = useState(item?.title ?? '')
+  const [kind, setKind] = useState<Kind>(item?.kind ?? 'gorev')
+  const [module, setModule] = useState<Module>(item?.module ?? 'genel')
+  const [date, setDate] = useState(() => (item ? (start ? dateValue(start) : '') : dateValue(new Date())))
+  const [time, setTime] = useState(item && start && hasTime(item) ? timeValue(start) : '')
+  const [reminders, setReminders] = useState<number[]>(item ? item.reminders.map((r) => r.offset_minutes) : [0])
+  const [repeat, setRepeat] = useState<Repeat | null>(item?.repeat ?? null)
+  const [confirmDelete, setConfirmDelete] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [pushOff, setPushOff] = useState(false)
 
   useEffect(() => {
-    titleRef.current?.focus()
+    if (!item) titleRef.current?.focus()
     getPushState().then((s) => setPushOff(s !== 'enabled'))
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [onClose])
+  }, [onClose, item])
 
   const wantsReminder = reminders.length > 0 && date !== ''
 
@@ -96,12 +101,20 @@ function Sheet({ onClose }: { onClose: () => void }) {
     const clock = time || (wantsReminder ? '09:00' : '00:00')
     const starts_at = date ? new Date(`${date}T${clock}`).toISOString() : null
     try {
-      await add({ title: title.trim(), kind, module, starts_at, repeat: date ? repeat : null, reminders: wantsReminder ? reminders : [] })
+      const data = { title: title.trim(), kind, module, starts_at, repeat: date ? repeat : null, reminders: wantsReminder ? reminders : [] }
+      if (item) await update(item.id, data)
+      else await add(data)
       onClose()
     } catch {
-      setError('Kayıt eklenemedi. İnternet bağlantını kontrol edip tekrar dene.')
+      setError(item ? 'Değişiklik kaydedilemedi. İnternet bağlantını kontrol edip tekrar dene.' : 'Kayıt eklenemedi. İnternet bağlantını kontrol edip tekrar dene.')
       setBusy(false)
     }
+  }
+
+  async function deleteItem() {
+    if (!item) return
+    await remove(item.id)
+    onClose()
   }
 
   const chip = (active: boolean) =>
@@ -114,12 +127,12 @@ function Sheet({ onClose }: { onClose: () => void }) {
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
-        aria-label="Yeni kayıt"
+        aria-label={item ? 'Kaydı düzenle' : 'Yeni kayıt'}
         className="mx-auto flex max-h-[92dvh] w-full max-w-xl flex-col gap-4 overflow-y-auto rounded-t-[28px] bg-bg px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+16px)] shadow-[0_-12px_40px_-20px_var(--shadow)]"
       >
         <span className="mx-auto h-1.5 w-12 rounded-full bg-fg/20" aria-hidden />
         <div className="flex items-center justify-between">
-          <h2 className="font-display text-[34px] leading-none font-bold">Yeni kayıt</h2>
+          <h2 className="font-display text-[34px] leading-none font-bold">{item ? 'Kaydı düzenle' : 'Yeni kayıt'}</h2>
           <button type="button" onClick={onClose} className="text-[17px] text-fg/70">
             Vazgeç
           </button>
@@ -228,6 +241,25 @@ function Sheet({ onClose }: { onClose: () => void }) {
         <button type="submit" disabled={busy || !title.trim()} className="rounded-2xl bg-accent py-3 text-[21px] text-accent-fg disabled:opacity-50">
           {busy ? 'Kaydediliyor…' : 'Kaydet'}
         </button>
+
+        {item &&
+          (confirmDelete ? (
+            <div className="flex flex-col gap-2 rounded-2xl border border-danger/30 bg-white/70 p-3">
+              <p className="text-[16px]">Bu kayıt ve hatırlatmaları silinsin mi?</p>
+              <div className="grid grid-cols-2 gap-2">
+                <button type="button" onClick={deleteItem} className="rounded-xl bg-danger py-2 text-[17px] text-white">
+                  Evet, sil
+                </button>
+                <button type="button" onClick={() => setConfirmDelete(false)} className="rounded-xl border border-line py-2 text-[17px]">
+                  Vazgeç
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button type="button" onClick={() => setConfirmDelete(true)} className="py-1 text-[17px] text-danger">
+              Kaydı sil
+            </button>
+          ))}
       </form>
     </div>
   )

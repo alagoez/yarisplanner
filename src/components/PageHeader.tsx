@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router'
 import HandIcon, { LogoMark } from './HandIcon'
+import { isDone, onDay, useItems } from '../lib/items'
+import { useNow } from '../lib/useNow'
 import { Art } from './ui'
 
 type Props = {
@@ -9,11 +11,13 @@ type Props = {
   brand?: string
   /** public/art altındaki başlık çizimi */
   art?: string
-  /** Bildirim zilinde kırmızı nokta gösterilsin mi */
-  unread?: boolean
 }
 
-export default function PageHeader({ title, subtitle, brand = 'Asistanım', art, unread }: Props) {
+export default function PageHeader({ title, subtitle, brand = 'Asistanım', art }: Props) {
+  const { items } = useItems()
+  const now = useNow()
+  // Bugün henüz bitmemiş, hatırlatmalı kayıt varsa zilde kırmızı nokta
+  const unread = onDay(items, now).some((i) => !isDone(i) && i.reminders.length > 0)
   return (
     <header className="relative flex min-h-[200px] flex-col gap-4 pb-3">
       {art && <Art name={art} className="absolute top-9 -right-3 w-[58%] max-w-[270px]" />}

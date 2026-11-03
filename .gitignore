@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Bildirim anahtarları (gizli kısmı Supabase fonksiyon ayarlarında)
+supabase/.vapid.local.json
+supabase/.env

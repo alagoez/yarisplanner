@@ -3,11 +3,11 @@ import HandIcon from '../components/HandIcon'
 import PageHeader from '../components/PageHeader'
 import { Art, CheckBox, IconChip, Muted, Twinkle } from '../components/ui'
 import { dayIndex, DAY_SHORT, weekOf, weekRangeLabel } from '../lib/dates'
-import { useAppData } from '../lib/demo'
+import { useExtras } from '../lib/demo'
 import { useNow } from '../lib/useNow'
 
 export default function Dinner() {
-  const data = useAppData()
+  const data = useExtras()
   const today = useNow()
   const [shopping, setShopping] = useState(data.shopping)
   const todayIndex = dayIndex(today)
@@ -23,7 +23,6 @@ export default function Dinner() {
           </>
         }
         art="dinner-hero"
-        unread={data.summary.reminders > 0}
       />
 
       <div className="card grid grid-cols-2 gap-1 p-1.5">

@@ -1,103 +1,36 @@
 /**
  * Tasarım görsellerindeki örnek içerik. Yalnızca geliştirmede, adrese ?demo eklenince
- * gösterilir; yayındaki uygulamada hiçbir zaman görünmez. Faz 1'de bu veriler
- * Supabase'den gelen gerçek kayıtlarla değiştirilecek.
+ * gösterilir; yayındaki uygulamada hiçbir zaman görünmez.
  */
+import type { Item, Kind, Module } from './items'
 
 export type Tag = 'is' | 'okul'
-export type ScheduleItem = { start: string; end?: string; title: string; detail?: string; tag?: Tag }
 export type CheckItem = { title: string; done?: boolean; note?: string }
-export type Exam = { title: string; when: string }
 export type Project = { title: string; detail: string; progress: number; done?: boolean; tag: Tag }
-export type CareItem = { when: string; title: string }
-export type Trip = { from: string; to: string; when: string; whenShort: string; reminder: boolean }
 export type DayMeal = { day: number; meal: string }
 
-export type AppData = {
-  summary: { events: number; tasks: number; reminders: number }
-  /** Hafta şeridindeki gün başına kayıt sayısı (Pzt=0) */
-  weekDots: number[]
-  schedule: ScheduleItem[]
-  tasks: CheckItem[]
-  workReminders: number
-  schoolReminders: number
+/** Henüz veritabanına bağlanmamış bölümlerin (yemek, alışveriş, listeler, projeler) verisi */
+export type Extras = {
   dinnerToday?: string
   shoppingCount: number
-  careToday: CheckItem[]
-  care: CareItem[]
-  trip?: Trip
   movies: number
   goals: number
-  exams: Exam[]
-  homework: CheckItem[]
   projects: Project[]
-  workTasks: CheckItem[]
   meals: DayMeal[]
   shopping: CheckItem[]
   mealIdeas: string[]
 }
 
-export const EMPTY_DATA: AppData = {
-  summary: { events: 0, tasks: 0, reminders: 0 },
-  weekDots: [0, 0, 0, 0, 0, 0, 0],
-  schedule: [],
-  tasks: [],
-  workReminders: 0,
-  schoolReminders: 0,
-  shoppingCount: 0,
-  careToday: [],
-  care: [],
-  movies: 0,
-  goals: 0,
-  exams: [],
-  homework: [],
-  projects: [],
-  workTasks: [],
-  meals: [],
-  shopping: [],
-  mealIdeas: [],
-}
+export const EMPTY_EXTRAS: Extras = { shoppingCount: 0, movies: 0, goals: 0, projects: [], meals: [], shopping: [], mealIdeas: [] }
 
-export const DEMO_DATA: AppData = {
-  summary: { events: 3, tasks: 5, reminders: 2 },
-  weekDots: [1, 2, 1, 3, 1, 0, 1],
-  schedule: [
-    { start: '10:00', end: '11:00', title: 'Ekip toplantısı', detail: 'Q1 hedefleri ve proje durumu', tag: 'is' },
-    { start: '13:00', end: '14:00', title: 'Seminer: Araştırma Yöntemleri', detail: 'Yüksek lisans • B-204', tag: 'okul' },
-    { start: '15:00', end: '16:30', title: 'Proje durum değerlendirmesi', detail: 'Milestone 2 – Gözden geçirme', tag: 'is' },
-    { start: '19:00', end: '21:00', title: 'Tez çalışması', detail: 'Literatür taraması ve taslak yazımı', tag: 'okul' },
-  ],
-  tasks: [{ title: 'Sunum dosyasını tamamla' }, { title: 'Market alışverişi yap' }, { title: 'Seyahat biletlerini kontrol et' }],
-  workReminders: 2,
-  schoolReminders: 1,
+export const DEMO_EXTRAS: Extras = {
   dinnerToday: 'Fırında tavuk, sebze sote ve bulgur pilavı',
   shoppingCount: 5,
-  careToday: [{ title: 'Cilt bakımı', done: true }, { title: 'Su takibini tamamla' }, { title: '30 dk. yürüyüş' }],
-  care: [
-    { when: '23 Oca Per, 14:00', title: 'Kuaför • Saç kesimi' },
-    { when: '27 Oca Pzt, 10:30', title: 'Cilt bakımı rutini' },
-  ],
-  trip: { from: 'İstanbul', to: 'İzmir', when: '28 Oca Sal, 09:20', whenShort: '28 Ocak Sal, 09:20', reminder: true },
   movies: 5,
   goals: 3,
-  exams: [
-    { title: 'Ara Sınav – Araştırma Yönt.', when: '28 Ocak Sal, 10:00' },
-    { title: 'Final – İleri Veri Analizi', when: '12 Şubat Çar, 14:00' },
-  ],
-  homework: [
-    { title: 'Literatür özeti', done: true, note: 'Teslim edildi' },
-    { title: 'Makale analizi raporu', note: 'Son teslim: 27 Ocak' },
-    { title: 'Sunum hazırlığı', note: 'Son teslim: 29 Ocak' },
-  ],
   projects: [
     { title: 'Tez Projesi', detail: 'Literatür taraması (%60)', progress: 60, done: true, tag: 'okul' },
     { title: 'İş – Müşteri Analiz Projesi', detail: 'Milestone 2 (bu hafta)', progress: 75, tag: 'is' },
-  ],
-  workTasks: [
-    { title: 'Haftalık raporu gönder', done: true },
-    { title: 'Proje sunumunu güncelle' },
-    { title: 'Müşteri geri bildirimlerini topla' },
-    { title: 'Q1 planını netleştir' },
   ],
   meals: [
     { day: 0, meal: 'Tavuk sote ve bulgur pilavı' },
@@ -123,6 +56,51 @@ export const DEMO_DATA: AppData = {
 /** Tasarım görsellerindeki tarih: 23 Ocak 2025 Perşembe, 09:24 */
 export const DEMO_DATE = new Date(2025, 0, 23, 9, 24)
 
+let seq = 0
+function demo(title: string, module: Module, kind: Kind, day: number, time: string | null, extra: Partial<Item> = {}): Item {
+  const [h, m] = time ? time.split(':').map(Number) : [0, 0]
+  return {
+    id: `demo-${seq++}`,
+    title,
+    notes: null,
+    module,
+    kind,
+    starts_at: new Date(2025, 0, day, h, m).toISOString(),
+    ends_at: null,
+    repeat: null,
+    done_at: null,
+    reminders: [{ offset_minutes: 15 }],
+    ...extra,
+  }
+}
+
+const doneToday = { done_at: new Date(2025, 0, 23, 8, 0).toISOString() }
+
+export const DEMO_ITEMS: Item[] = [
+  demo('Ekip toplantısı', 'is', 'toplanti', 23, '10:00', { notes: 'Q1 hedefleri ve proje durumu', ends_at: new Date(2025, 0, 23, 11).toISOString() }),
+  demo('Seminer: Araştırma Yöntemleri', 'okul', 'etkinlik', 23, '13:00', { notes: 'Yüksek lisans • B-204', ends_at: new Date(2025, 0, 23, 14).toISOString() }),
+  demo('Proje sunumu', 'is', 'toplanti', 23, '15:30', { notes: 'Milestone 2 – Gözden geçirme', ends_at: new Date(2025, 0, 23, 16, 30).toISOString() }),
+  demo('Tez çalışması', 'okul', 'etkinlik', 23, '19:00', { notes: 'Literatür taraması ve taslak yazımı', ends_at: new Date(2025, 0, 23, 21).toISOString() }),
+  demo('Sunum dosyasını tamamla', 'genel', 'gorev', 23, null),
+  demo('Market alışverişi yap', 'genel', 'gorev', 23, null),
+  demo('Seyahat biletlerini kontrol et', 'genel', 'gorev', 23, null),
+  demo('Cilt bakımı', 'bakim', 'gorev', 23, null, doneToday),
+  demo('Su takibini tamamla', 'bakim', 'gorev', 23, null),
+  demo('30 dk. yürüyüş', 'bakim', 'gorev', 23, null),
+  demo('Kuaför • Saç kesimi', 'bakim', 'randevu', 23, '14:00'),
+  demo('Cilt bakımı rutini', 'bakim', 'randevu', 27, '10:30'),
+  demo('İstanbul → İzmir', 'seyahat', 'seyahat', 28, '09:20', { reminders: [{ offset_minutes: 1440 }] }),
+  demo('Ara Sınav – Araştırma Yönt.', 'okul', 'sinav', 28, '10:00'),
+  demo('Final – İleri Veri Analizi', 'okul', 'sinav', 43, '14:00'),
+  demo('Literatür özeti', 'okul', 'odev', 22, null, doneToday),
+  demo('Makale analizi raporu', 'okul', 'odev', 27, null),
+  demo('Sunum hazırlığı', 'okul', 'odev', 29, null),
+  demo('Haftalık raporu gönder', 'is', 'gorev', 23, null, doneToday),
+  demo('Proje sunumunu güncelle', 'is', 'gorev', 23, null),
+  demo('Müşteri geri bildirimlerini topla', 'is', 'gorev', 24, null),
+  demo('Q1 planını netleştir', 'is', 'gorev', 24, null),
+]
+
 function readDemoFlag() {
   if (import.meta.env.MODE === 'production') return false
   const fromUrl = new URLSearchParams(window.location.search).has('demo')
@@ -136,6 +114,6 @@ function readDemoFlag() {
 
 export const IS_DEMO = readDemoFlag()
 
-export function useAppData(): AppData {
-  return IS_DEMO ? DEMO_DATA : EMPTY_DATA
+export function useExtras(): Extras {
+  return IS_DEMO ? DEMO_EXTRAS : EMPTY_EXTRAS
 }

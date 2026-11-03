@@ -2,15 +2,22 @@ import { Link } from 'react-router'
 import HandIcon, { type IconName } from '../components/HandIcon'
 import PageHeader from '../components/PageHeader'
 import { Art, CardHeading, Muted, SeeAll, Timeline, TimelineRow, Twinkle } from '../components/ui'
-import { useAppData } from '../lib/demo'
+import { useExtras } from '../lib/demo'
+import { formatLong, formatShort, hasTime, splitRoute, upcoming, useItems } from '../lib/items'
+import { useNow } from '../lib/useNow'
 import { LISTS } from '../lib/lists'
 
 export default function Lists() {
-  const data = useAppData()
+  const extras = useExtras()
+  const { items } = useItems()
+  const next = upcoming(items, useNow())
+  const care = next.filter((i) => i.module === 'bakim' && hasTime(i)).slice(0, 3)
+  const trip = next.find((i) => i.kind === 'seyahat')
+  const route = trip ? splitRoute(trip.title) : null
   const counts: Record<string, string> = {
-    alinacaklar: data.shoppingCount > 0 ? `${data.shoppingCount} ürün` : 'Liste boş',
-    filmler: data.movies > 0 ? `İzlenecekler listesi · ${data.movies} film` : 'İzlenecekler listesi',
-    hedefler: data.goals > 0 ? `Bu ay için · ${data.goals} hedef` : 'Bu ay için hedef yok',
+    alinacaklar: extras.shoppingCount > 0 ? `${extras.shoppingCount} ürün` : 'Liste boş',
+    filmler: extras.movies > 0 ? `İzlenecekler listesi · ${extras.movies} film` : 'İzlenecekler listesi',
+    hedefler: extras.goals > 0 ? `Bu ay için · ${extras.goals} hedef` : 'Bu ay için hedef yok',
   }
 
   return (
@@ -24,17 +31,16 @@ export default function Lists() {
           </>
         }
         art="lists-hero"
-        unread={data.summary.reminders > 0}
       />
 
       <section className="card relative isolate flex flex-col gap-2 overflow-hidden p-3.5">
         <Art name="care" className="absolute -top-1 -right-2 -z-10 w-[40%] max-w-[170px]" />
         <CardHeading icon="lotus" title="Kişisel Bakım" subtitle="Yaklaşan bakım ve randevuların" />
-        {data.care.length > 0 ? (
+        {care.length > 0 ? (
           <Timeline>
-            {data.care.map((item, i) => (
-              <TimelineRow key={item.when} last={i === data.care.length - 1}>
-                <span className="w-[132px] shrink-0 text-[16px]">{item.when}</span>
+            {care.map((item, i) => (
+              <TimelineRow key={item.id} last={i === care.length - 1}>
+                <span className="w-[132px] shrink-0 text-[16px]">{formatShort(item)}</span>
                 <span className="truncate text-[16px] text-fg/85">{item.title}</span>
               </TimelineRow>
             ))}
@@ -48,19 +54,19 @@ export default function Lists() {
       <section className="card relative isolate flex flex-col gap-2.5 overflow-hidden p-3.5">
         <Art name="plane" className="absolute -top-2 -right-3 -z-10 w-[46%] max-w-[200px]" />
         <CardHeading icon="plane" title="Seyahat" subtitle="Yaklaşan seyahatin" />
-        {data.trip ? (
+        {trip && route ? (
           <div className="flex items-end justify-between gap-3">
             <div className="flex flex-col gap-1">
               <span className="flex items-center gap-2 text-[19px]">
                 <HandIcon name="plane" size={22} />
-                {data.trip.from} → {data.trip.to}
+                {route.to ? `${route.from} → ${route.to}` : route.from}
               </span>
               <span className="flex items-center gap-2 text-[16px] text-fg/80">
                 <HandIcon name="calendar" size={22} />
-                {data.trip.when}
+                {formatLong(trip)}
               </span>
             </div>
-            {data.trip.reminder && (
+            {trip.reminders.length > 0 && (
               <span className="flex shrink-0 items-center gap-1.5 rounded-full border border-accent/40 bg-white/70 px-3 py-1 text-[15px] text-accent-strong">
                 <HandIcon name="bell" size={18} />
                 Hatırlatma var

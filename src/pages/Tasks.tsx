@@ -1,20 +1,41 @@
 import { useState } from 'react'
+import HandIcon from '../components/HandIcon'
 import PageHeader from '../components/PageHeader'
 import { CheckBox, Muted, Twinkle } from '../components/ui'
-import { useAppData } from '../lib/demo'
+import { addDays } from '../lib/dates'
+import { formatShort, isDone, startOf, useItems, type Item } from '../lib/items'
+import { useNow } from '../lib/useNow'
 
-const VIEWS = [
-  { key: 'bugun', label: 'Bugün', empty: 'Bugün için görev yok.' },
-  { key: 'yaklasan', label: 'Yaklaşan', empty: 'Yaklaşan görev yok.' },
-  { key: 'geciken', label: 'Geciken', empty: 'Geciken görev yok.' },
-  { key: 'tamamlanan', label: 'Bitti', empty: 'Henüz tamamlanan görev yok.' },
+type View = 'bugun' | 'yaklasan' | 'geciken' | 'tamamlanan'
+
+const VIEWS: { key: View; label: string; empty: string }[] = [
+  { key: 'bugun', label: 'Bugün', empty: 'Bugün için kayıt yok. Sağ alttaki + ile ekleyebilirsin.' },
+  { key: 'yaklasan', label: 'Yaklaşan', empty: 'Yaklaşan kayıt yok.' },
+  { key: 'geciken', label: 'Geciken', empty: 'Geciken kayıt yok.' },
+  { key: 'tamamlanan', label: 'Bitti', empty: 'Henüz tamamlanan kayıt yok.' },
 ]
 
+const REPEAT_LABEL = { gunluk: 'her gün', haftalik: 'her hafta', aylik: 'her ay', yillik: 'her yıl' }
+
 export default function Tasks() {
-  const data = useAppData()
-  const [view, setView] = useState(VIEWS[0])
-  const [tasks, setTasks] = useState([...data.tasks, ...data.workTasks])
-  const shown = view.key === 'tamamlanan' ? tasks.filter((t) => t.done) : view.key === 'bugun' ? tasks.filter((t) => !t.done) : []
+  const { items, toggleDone, remove } = useItems()
+  const now = useNow()
+  const [view, setView] = useState<View>('bugun')
+  const [confirming, setConfirming] = useState<string | null>(null)
+
+  const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const startTomorrow = addDays(startToday, 1)
+  const inView = (i: Item) => {
+    const d = startOf(i)
+    if (view === 'tamamlanan') return isDone(i)
+    if (isDone(i)) return false
+    if (view === 'bugun') return !d || (d >= startToday && d < startTomorrow)
+    if (view === 'yaklasan') return !!d && d >= startTomorrow
+    return !!d && d < startToday
+  }
+  const shown = items
+    .filter(inView)
+    .sort((a, b) => (view === 'tamamlanan' ? (b.done_at ?? '').localeCompare(a.done_at ?? '') : (a.starts_at ?? '9').localeCompare(b.starts_at ?? '9')))
 
   return (
     <>
@@ -27,7 +48,6 @@ export default function Tasks() {
           </>
         }
         art="notebook"
-        unread={data.summary.reminders > 0}
       />
 
       <div role="tablist" aria-label="Görünüm" className="card grid grid-cols-4 gap-1 p-1.5">
@@ -35,29 +55,50 @@ export default function Tasks() {
           <button
             key={v.key}
             role="tab"
-            aria-selected={view.key === v.key}
-            onClick={() => setView(v)}
-            className={`rounded-[14px] py-2 text-[17px] ${view.key === v.key ? 'bg-accent text-accent-fg' : 'text-fg/75'}`}
+            aria-selected={view === v.key}
+            onClick={() => setView(v.key)}
+            className={`rounded-[14px] py-2 text-[17px] ${view === v.key ? 'bg-accent text-accent-fg' : 'text-fg/75'}`}
           >
             {v.label}
           </button>
         ))}
       </div>
 
-      <section className="card flex flex-col gap-2.5 p-3.5">
+      <section className="card flex flex-col p-1.5">
         {shown.length > 0 ? (
-          shown.map((task) => (
-            <div key={task.title} className="flex items-center gap-2.5 text-[17px]">
-              <CheckBox
-                checked={!!task.done}
-                label={task.title}
-                onToggle={() => setTasks(tasks.map((t) => (t === task ? { ...t, done: !t.done } : t)))}
-              />
-              <span className={task.done ? 'text-muted line-through' : ''}>{task.title}</span>
-            </div>
-          ))
+          <ul className="flex flex-col divide-y divide-dashed divide-line">
+            {shown.map((item) => (
+              <li key={item.id} className="flex items-center gap-3 px-2 py-2.5">
+                <CheckBox checked={isDone(item)} label={item.title} onToggle={() => toggleDone(item.id)} />
+                <div className="flex min-w-0 flex-1 flex-col leading-tight">
+                  <span className={`text-[17px] ${isDone(item) ? 'text-muted line-through' : ''}`}>{item.title}</span>
+                  <span className="flex flex-wrap items-center gap-x-2 text-[14px] text-fg/65">
+                    {formatShort(item)}
+                    {item.repeat && <span>· {REPEAT_LABEL[item.repeat]}</span>}
+                    {item.reminders.length > 0 && !isDone(item) && <HandIcon name="bell" size={15} className="text-accent-strong" />}
+                  </span>
+                </div>
+                {confirming === item.id ? (
+                  <span className="flex shrink-0 gap-1.5">
+                    <button type="button" onClick={() => remove(item.id)} className="rounded-full bg-danger px-3 py-1 text-[15px] text-white">
+                      Sil
+                    </button>
+                    <button type="button" onClick={() => setConfirming(null)} className="rounded-full border border-line px-3 py-1 text-[15px]">
+                      Vazgeç
+                    </button>
+                  </span>
+                ) : (
+                  <button type="button" onClick={() => setConfirming(item.id)} aria-label={`${item.title} kaydını sil`} className="shrink-0 px-1 text-[15px] text-fg/50">
+                    Sil
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
         ) : (
-          <Muted>{view.empty}</Muted>
+          <div className="p-2">
+            <Muted>{VIEWS.find((v) => v.key === view)!.empty}</Muted>
+          </div>
         )}
       </section>
     </>

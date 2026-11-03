@@ -3,7 +3,8 @@ import HandIcon, { type IconName } from '../components/HandIcon'
 import PageHeader from '../components/PageHeader'
 import { Art, CardHeading, CheckBox, Muted, Twinkle } from '../components/ui'
 import { addDays, DAY_SHORT, formatDayTitle, formatMonthYear, isSameDay, weekOf } from '../lib/dates'
-import { useAppData, type CheckItem, type Tag } from '../lib/demo'
+import { useExtras, type Tag } from '../lib/demo'
+import { formatLong, formatTime, hasTime, isDone, isTask, onDay, upcoming, useItems, type Item } from '../lib/items'
 import { useNow } from '../lib/useNow'
 
 type Filter = 'tumu' | Tag
@@ -14,19 +15,26 @@ const FILTERS: { key: Filter; label: string; icon: IconName }[] = [
   { key: 'okul', label: 'Okul', icon: 'gradCap' },
 ]
 
+const timeOf = (iso: string) => new Intl.DateTimeFormat('tr-TR', { hour: '2-digit', minute: '2-digit' }).format(new Date(iso))
+
 export default function Calendar() {
-  const data = useAppData()
+  const extras = useExtras()
+  const { items, toggleDone } = useItems()
   const today = useNow()
   const [filter, setFilter] = useState<Filter>('tumu')
   const [weekOffset, setWeekOffset] = useState(0)
   const [selected, setSelected] = useState<Date | null>(null)
-  const [homework, setHomework] = useState(data.homework)
-  const [projects, setProjects] = useState(data.projects)
-  const [workTasks, setWorkTasks] = useState(data.workTasks)
+  const [projects, setProjects] = useState(extras.projects)
 
   const day = selected ?? today
   const days = weekOf(addDays(today, weekOffset * 7))
-  const schedule = isSameDay(day, today) ? data.schedule.filter((item) => filter === 'tumu' || item.tag === filter) : []
+  const matches = (i: Item) => filter === 'tumu' || i.module === filter
+  const schedule = onDay(items, day).filter((i) => hasTime(i) && matches(i))
+  const next = upcoming(items, today)
+  const exams = next.filter((i) => i.kind === 'sinav')
+  const recentlyDone = (i: Item) => isDone(i) && today.getTime() - new Date(i.done_at!).getTime() < 7 * 864e5
+  const homework = items.filter((i) => i.kind === 'odev' && (!isDone(i) || recentlyDone(i)))
+  const workTasks = items.filter((i) => i.module === 'is' && isTask(i) && (!isDone(i) || recentlyDone(i)))
   const showSchool = filter !== 'is'
   const showWork = filter !== 'okul'
 
@@ -42,7 +50,6 @@ export default function Calendar() {
           </>
         }
         art="planner-hero"
-        unread={data.summary.reminders > 0}
       />
 
       <div role="tablist" aria-label="Filtre" className="grid grid-cols-3 gap-2 rounded-[20px] bg-white/40 p-1.5">
@@ -89,7 +96,7 @@ export default function Calendar() {
         <ol className="grid grid-cols-7">
           {days.map((d, i) => {
             const active = isSameDay(d, day)
-            const dots = isSameDay(weekOf(d)[0], weekOf(today)[0]) ? data.weekDots[i] : 0
+            const dots = onDay(items, d).filter(matches).length
             return (
               <li key={d.toISOString()} className="flex flex-col items-center gap-1">
                 <span className="text-[14px] text-fg/65">{DAY_SHORT[i]}</span>
@@ -124,37 +131,38 @@ export default function Calendar() {
         {schedule.length > 0 ? (
           <ol className="relative flex flex-col before:absolute before:top-5 before:bottom-5 before:left-[4px] before:w-[1.5px] before:bg-accent/45">
             {schedule.map((item, i) => (
-              <li key={item.start} className="relative flex items-center gap-2 pl-5">
+              <li key={item.id} className="relative flex items-center gap-2 pl-5">
                 <span className="absolute left-0 size-[10px] rounded-full border-[1.5px] border-fg/70 bg-accent" aria-hidden />
                 <div className={`flex min-w-0 flex-1 items-center gap-2 py-2 ${i < schedule.length - 1 ? 'border-b border-dashed border-line' : ''}`}>
                   <span className="w-[86px] shrink-0 text-[15.5px]">
-                    {item.start} – {item.end}
+                    {formatTime(item)}
+                    {item.ends_at && ` – ${timeOf(item.ends_at)}`}
                   </span>
-                  {item.tag && <TagChip tag={item.tag} />}
+                  {(item.module === 'is' || item.module === 'okul') && <TagChip tag={item.module} />}
                   <div className="flex min-w-0 flex-col leading-tight">
-                    <span className="truncate text-[16px]">{item.title}</span>
-                    {item.detail && <span className="truncate text-[13.5px] text-fg/65">{item.detail}</span>}
+                    <span className={`truncate text-[16px] ${isDone(item) ? 'text-muted line-through' : ''}`}>{item.title}</span>
+                    {item.notes && <span className="truncate text-[13.5px] text-fg/65">{item.notes}</span>}
                   </div>
                 </div>
               </li>
             ))}
           </ol>
         ) : (
-          <Muted>Bu gün için plan yok.</Muted>
+          <Muted>Bu gün için plan yok. Sağ alttaki + ile ekleyebilirsin.</Muted>
         )}
       </section>
 
       <div className="grid grid-cols-2 gap-3">
         {showSchool && (
-          <Panel icon="gradCap" title="Yaklaşan Sınavlar" subtitle={`${data.exams.length} sınav`} art="books-cap" artClass="w-[46%] -right-3">
-            {data.exams.length > 0 ? (
+          <Panel icon="gradCap" title="Yaklaşan Sınavlar" subtitle={`${exams.length} sınav`} art="books-cap" artClass="w-[46%] -right-3">
+            {exams.length > 0 ? (
               <ul className="flex flex-col gap-2.5">
-                {data.exams.map((exam) => (
-                  <li key={exam.title} className="flex items-start gap-2 leading-tight">
+                {exams.map((exam) => (
+                  <li key={exam.id} className="flex items-start gap-2 leading-tight">
                     <HandIcon name="calendar" size={20} className="shrink-0" />
                     <div className="flex flex-col">
                       <span className="text-[15px]">{exam.title}</span>
-                      <span className="text-[13.5px] text-fg/65">{exam.when}</span>
+                      <span className="text-[13.5px] text-fg/65">{formatLong(exam)}</span>
                     </div>
                   </li>
                 ))}
@@ -167,7 +175,12 @@ export default function Calendar() {
 
         {showSchool && (
           <Panel icon="clipboard" title="Ödevler" subtitle={`${homework.length} ödev`} art="laptop" artClass="w-[46%] -right-4">
-            <Checklist items={homework} onChange={setHomework} empty="Ödev yok." />
+            <Checklist
+              items={homework}
+              onToggle={toggleDone}
+              note={(i) => (isDone(i) ? 'Teslim edildi' : i.starts_at ? `Son teslim: ${formatLong(i).split(',')[0]}` : '')}
+              empty="Ödev yok."
+            />
           </Panel>
         )}
 
@@ -202,8 +215,8 @@ export default function Calendar() {
         </Panel>
 
         {showWork && (
-          <Panel icon="briefcase" title="İş Takibi" subtitle={`${workTasks.length} görev`} art="coffee" artClass="w-[34%] -top-1 bottom-auto">
-            <Checklist items={workTasks} onChange={setWorkTasks} empty="İş görevi yok." />
+          <Panel icon="briefcase" title="İş Takibi" subtitle={`${workTasks.filter((i) => !isDone(i)).length} görev`} art="coffee" artClass="w-[34%] -top-1 bottom-auto">
+            <Checklist items={workTasks} onToggle={toggleDone} empty="İş görevi yok." />
           </Panel>
         )}
       </div>
@@ -233,20 +246,16 @@ function Panel({ icon, title, subtitle, art, artClass, children }: { icon: IconN
   )
 }
 
-function Checklist({ items, onChange, empty }: { items: CheckItem[]; onChange: (items: CheckItem[]) => void; empty: string }) {
+function Checklist({ items, onToggle, note, empty }: { items: Item[]; onToggle: (id: string) => void; note?: (item: Item) => string; empty: string }) {
   if (items.length === 0) return <Muted>{empty}</Muted>
   return (
     <ul className="flex flex-col gap-2">
-      {items.map((item, i) => (
-        <li key={item.title} className="flex items-start gap-2 leading-tight">
-          <CheckBox
-            checked={!!item.done}
-            label={item.title}
-            onToggle={() => onChange(items.map((x, j) => (j === i ? { ...x, done: !x.done } : x)))}
-          />
+      {items.map((item) => (
+        <li key={item.id} className="flex items-start gap-2 leading-tight">
+          <CheckBox checked={isDone(item)} label={item.title} onToggle={() => onToggle(item.id)} />
           <div className="flex flex-col">
-            <span className={`text-[15px] ${item.done ? 'text-muted line-through' : ''}`}>{item.title}</span>
-            {item.note && <span className="text-[13px] text-fg/65">{item.note}</span>}
+            <span className={`text-[15px] ${isDone(item) ? 'text-muted line-through' : ''}`}>{item.title}</span>
+            {note?.(item) && <span className="text-[13px] text-fg/65">{note(item)}</span>}
           </div>
         </li>
       ))}

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import HandIcon from '../components/HandIcon'
+import NotificationCard from '../components/NotificationCard'
 import PageHeader from '../components/PageHeader'
 import { useAuth } from '../lib/auth-context'
 import { supabase } from '../lib/supabase'
@@ -29,9 +30,10 @@ export default function Profile() {
         </div>
       </section>
 
+      <NotificationCard />
+
       <section className="card flex flex-col divide-y divide-dashed divide-line">
-        <Row label="Bildirimler" value="Çok yakında" />
-        <Row label="Sürüm" value="0.2" />
+        <Row label="Sürüm" value="0.3" />
       </section>
 
       <button

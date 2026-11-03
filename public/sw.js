@@ -1,5 +1,5 @@
 // Asistanım service worker: uygulama kabuğunu önbellekler, bildirimleri gösterir.
-const CACHE = 'asistanim-v1'
+const CACHE = 'asistanim-v2'
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.add('/')))
@@ -57,6 +57,7 @@ self.addEventListener('push', (event) => {
       body: data.body ?? '',
       icon: '/icons/icon-192.png',
       badge: '/icons/icon-192.png',
+      tag: data.tag,
       data: { url: data.url ?? '/' },
     }),
   )

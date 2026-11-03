@@ -1,21 +1,44 @@
-import { Heart, Sparkles } from 'lucide-react'
 import type { ReactNode } from 'react'
+import { Link } from 'react-router'
+import HandIcon, { LogoMark } from './HandIcon'
+import { Art } from './ui'
 
-type Props = { title: string; subtitle?: ReactNode }
+type Props = {
+  title: ReactNode
+  subtitle?: ReactNode
+  brand?: string
+  /** public/art altındaki başlık çizimi */
+  art?: string
+  /** Bildirim zilinde kırmızı nokta gösterilsin mi */
+  unread?: boolean
+}
 
-export default function PageHeader({ title, subtitle }: Props) {
+export default function PageHeader({ title, subtitle, brand = 'Asistanım', art, unread }: Props) {
   return (
-    <header className="flex flex-col gap-4 pb-2">
-      <div className="flex items-center gap-2 text-accent">
-        <Sparkles size={24} strokeWidth={1.6} aria-hidden />
-        <span className="font-display text-[22px] font-medium text-fg">Asistanım</span>
+    <header className="relative flex min-h-[200px] flex-col gap-4 pb-3">
+      {art && <Art name={art} className="absolute top-9 -right-3 w-[58%] max-w-[270px]" />}
+
+      <div className="relative flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <LogoMark size={32} />
+          <span className="font-display text-[34px] leading-none font-bold">{brand}</span>
+        </div>
+        <Link
+          to="/profil"
+          aria-label={unread ? 'Bildirimler, okunmamış var' : 'Bildirimler'}
+          className="relative grid size-11 place-items-center rounded-full bg-white/85 text-fg shadow-[0_6px_16px_-8px_var(--shadow)]"
+        >
+          <HandIcon name="bell" size={24} />
+          {unread && <span className="absolute top-2 right-2.5 size-2 rounded-full bg-[#e0475b] ring-2 ring-white" aria-hidden />}
+        </Link>
       </div>
-      <div className="flex flex-col gap-1">
-        <h1 className="flex items-center gap-2 font-display text-[34px] leading-tight font-semibold">
+
+      <div className="relative flex max-w-[60%] flex-col gap-1">
+        <h1 className="font-display text-[42px] leading-[0.95] font-bold">
           {title}
-          <Heart size={24} strokeWidth={1.4} className="shrink-0 text-accent/60" aria-hidden />
+          <HandIcon name="heart" size={28} fill="var(--icon-fill)" strokeWidth={1.4} className="ml-1.5 inline-block -translate-y-1 align-middle text-accent" />
         </h1>
-        {subtitle && <p className="text-[15px] text-muted">{subtitle}</p>}
+        {subtitle && <p className="text-[16px] leading-snug text-fg/75">{subtitle}</p>}
       </div>
     </header>
   )

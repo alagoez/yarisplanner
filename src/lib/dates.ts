@@ -2,7 +2,8 @@ export const DAY_SHORT = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz']
 
 const monthLong = new Intl.DateTimeFormat('tr-TR', { month: 'long' })
 const monthShort = new Intl.DateTimeFormat('tr-TR', { month: 'short' })
-const fullDate = new Intl.DateTimeFormat('tr-TR', { weekday: 'long', day: 'numeric', month: 'long' })
+const monthYear = new Intl.DateTimeFormat('tr-TR', { month: 'long', year: 'numeric' })
+const weekdayLong = new Intl.DateTimeFormat('tr-TR', { weekday: 'long' })
 
 /** Verilen günün haftasını Pazartesiden Pazara döndürür. */
 export function weekOf(date: Date) {
@@ -10,11 +11,20 @@ export function weekOf(date: Date) {
   return Array.from({ length: 7 }, (_, i) => new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i))
 }
 
+export function addDays(date: Date, days: number) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate() + days)
+}
+
 export function isSameDay(a: Date, b: Date) {
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
 }
 
-/** "3–9 Kasım" ya da ay değişiyorsa "27 Eki – 2 Kas" */
+/** Pazartesi=0 … Pazar=6 */
+export function dayIndex(date: Date) {
+  return (date.getDay() + 6) % 7
+}
+
+/** "20–26 Ocak" ya da ay değişiyorsa "27 Eki – 2 Kas" */
 export function weekRangeLabel(days: Date[]) {
   const first = days[0]
   const last = days[days.length - 1]
@@ -24,8 +34,14 @@ export function weekRangeLabel(days: Date[]) {
   return `${first.getDate()} ${monthShort.format(first)} – ${last.getDate()} ${monthShort.format(last)}`
 }
 
-export function formatFullDate(date: Date) {
-  return fullDate.format(date)
+/** "Perşembe, 23 Ocak" */
+export function formatDayTitle(date: Date) {
+  return `${weekdayLong.format(date)}, ${date.getDate()} ${monthLong.format(date)}`
+}
+
+/** "Ocak 2025" */
+export function formatMonthYear(date: Date) {
+  return monthYear.format(date)
 }
 
 export function greeting(date: Date) {

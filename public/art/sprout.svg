@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 130" width="100" height="130">
+<defs><filter id="w3" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="3"/><feDisplacementMap in="SourceGraphic" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter><filter id="w8" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="8"/><feDisplacementMap in="SourceGraphic" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter></defs>
+<g stroke-linecap="round" stroke-linejoin="round">
+<g fill="none" stroke="#93B884" stroke-width="2.6" filter="url(#w3)"><path d="M50 92C50 70 48 52 44 36"/></g>
+<g transform="translate(2.6 2.8)"><g transform="translate(48 74) rotate(-150) scale(0.85)" fill="#BCD4A9" filter="url(#w8)"><path d="M0 0C8 -9 20 -9 28 0C20 9 8 9 0 0Z"/></g></g><g transform="translate(48 74) rotate(-150) scale(0.85)" fill="none" stroke="#5B3A42" stroke-width="2.4" filter="url(#w3)"><path d="M0 0C8 -9 20 -9 28 0C20 9 8 9 0 0Z"/></g>
+<g transform="translate(48 74) rotate(-150) scale(0.85)" fill="none" stroke="#5B3A42" stroke-width="1.6" opacity="0.6" filter="url(#w3)"><path d="M4 0H24"/></g>
+<g transform="translate(2.6 2.8)"><g transform="translate(50 66) rotate(-30) scale(0.85)" fill="#93B884" filter="url(#w8)"><path d="M0 0C8 -9 20 -9 28 0C20 9 8 9 0 0Z"/></g></g><g transform="translate(50 66) rotate(-30) scale(0.85)" fill="none" stroke="#5B3A42" stroke-width="2.4" filter="url(#w3)"><path d="M0 0C8 -9 20 -9 28 0C20 9 8 9 0 0Z"/></g>
+<g transform="translate(50 66) rotate(-30) scale(0.85)" fill="none" stroke="#5B3A42" stroke-width="1.6" opacity="0.6" filter="url(#w3)"><path d="M4 0H24"/></g>
+<g transform="translate(2.6 2.8)"><g transform="translate(46 50) rotate(-140) scale(0.75)" fill="#93B884" filter="url(#w8)"><path d="M0 0C8 -9 20 -9 28 0C20 9 8 9 0 0Z"/></g></g><g transform="translate(46 50) rotate(-140) scale(0.75)" fill="none" stroke="#5B3A42" stroke-width="2.4" filter="url(#w3)"><path d="M0 0C8 -9 20 -9 28 0C20 9 8 9 0 0Z"/></g>
+<g transform="translate(46 50) rotate(-140) scale(0.75)" fill="none" stroke="#5B3A42" stroke-width="1.6" opacity="0.6" filter="url(#w3)"><path d="M4 0H24"/></g>
+<g transform="translate(2.6 2.8)"><g transform="translate(46 44) rotate(-45) scale(0.7)" fill="#BCD4A9" filter="url(#w8)"><path d="M0 0C8 -9 20 -9 28 0C20 9 8 9 0 0Z"/></g></g><g transform="translate(46 44) rotate(-45) scale(0.7)" fill="none" stroke="#5B3A42" stroke-width="2.4" filter="url(#w3)"><path d="M0 0C8 -9 20 -9 28 0C20 9 8 9 0 0Z"/></g>
+<g transform="translate(46 44) rotate(-45) scale(0.7)" fill="none" stroke="#5B3A42" stroke-width="1.6" opacity="0.6" filter="url(#w3)"><path d="M4 0H24"/></g>
+<g transform="translate(2.6 2.8)"><g fill="#EBA1AD" filter="url(#w8)"><path d="M28 92H72L66 122C65 125 62 126 60 126H40C38 126 35 125 34 122Z"/></g></g><g fill="none" stroke="#5B3A42" stroke-width="2.4" filter="url(#w3)"><path d="M28 92H72L66 122C65 125 62 126 60 126H40C38 126 35 125 34 122Z"/></g>
+<g transform="translate(2.6 2.8)"><g fill="#D97C8C" filter="url(#w8)"><rect x="24" y="86" width="52" height="10" rx="4"/></g></g><g fill="none" stroke="#5B3A42" stroke-width="2" filter="url(#w3)"><rect x="24" y="86" width="52" height="10" rx="4"/></g>
+<g fill="#F2A0AE" opacity="0.8" filter="url(#w3)"><ellipse cx="43.4" cy="108.4" rx="2.76" ry="1.62"/></g>
+<g fill="#F2A0AE" opacity="0.8" filter="url(#w3)"><ellipse cx="56.6" cy="108.4" rx="2.76" ry="1.62"/></g>
+<g fill="#5B3A42" filter="url(#w3)"><circle cx="46.4" cy="106" r="1.38"/></g>
+<g fill="#5B3A42" filter="url(#w3)"><circle cx="53.6" cy="106" r="1.38"/></g>
+<g fill="none" stroke="#5B3A42" stroke-width="2" filter="url(#w3)"><path d="M47.9 108.4Q50 110.5 52.1 108.4"/></g>
+<g transform="translate(2.6 2.8)"><g transform="translate(82 30) scale(0.6)" fill="#F9E2A0" filter="url(#w8)"><path d="M0 -8C1 -2 2 -1 8 0C2 1 1 2 0 8C-1 2 -2 1 -8 0C-2 -1 -1 -2 0 -8Z"/></g></g><g transform="translate(82 30) scale(0.6)" fill="none" stroke="#5B3A42" stroke-width="2" filter="url(#w3)"><path d="M0 -8C1 -2 2 -1 8 0C2 1 1 2 0 8C-1 2 -2 1 -8 0C-2 -1 -1 -2 0 -8Z"/></g>
+</g>
+</svg>

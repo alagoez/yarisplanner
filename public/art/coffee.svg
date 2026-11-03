@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 110" width="120" height="110">
+<defs><filter id="w3" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="3"/><feDisplacementMap in="SourceGraphic" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter><filter id="w8" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="8"/><feDisplacementMap in="SourceGraphic" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter></defs>
+<g stroke-linecap="round" stroke-linejoin="round">
+<g transform="translate(2.6 2.8)"><g fill="#FFFDFB" filter="url(#w8)"><ellipse cx="58" cy="92" rx="34" ry="6"/></g></g><g fill="none" stroke="#5B3A42" stroke-width="2.4" filter="url(#w3)"><ellipse cx="58" cy="92" rx="34" ry="6"/></g>
+<g fill="none" stroke="#5B3A42" stroke-width="3" filter="url(#w3)"><path d="M82 50C97 48 99 66 80 68"/></g>
+<g transform="translate(2.6 2.8)"><g fill="#FFFDFB" filter="url(#w8)"><path d="M32 44L84 44C84 70 74 88 58 88C42 88 32 70 32 44Z"/></g></g><g fill="none" stroke="#5B3A42" stroke-width="2.4" filter="url(#w3)"><path d="M32 44L84 44C84 70 74 88 58 88C42 88 32 70 32 44Z"/></g>
+<g transform="translate(2.6 2.8)"><g fill="#C9926B" filter="url(#w8)"><ellipse cx="58" cy="44" rx="26" ry="5.5"/></g></g><g fill="none" stroke="#5B3A42" stroke-width="2.4" filter="url(#w3)"><ellipse cx="58" cy="44" rx="26" ry="5.5"/></g>
+<g fill="#F2A0AE" opacity="0.8" filter="url(#w3)"><ellipse cx="47.55" cy="65.8" rx="4.369999999999999" ry="2.565"/></g>
+<g fill="#F2A0AE" opacity="0.8" filter="url(#w3)"><ellipse cx="68.45" cy="65.8" rx="4.369999999999999" ry="2.565"/></g>
+<g fill="#5B3A42" filter="url(#w3)"><circle cx="52.3" cy="62" r="2.1849999999999996"/></g>
+<g fill="#5B3A42" filter="url(#w3)"><circle cx="63.7" cy="62" r="2.1849999999999996"/></g>
+<g fill="none" stroke="#5B3A42" stroke-width="2" filter="url(#w3)"><path d="M54.675 65.8Q58 69.125 61.325 65.8"/></g>
+<g fill="none" stroke="#D97C8C" stroke-width="2" opacity="0.7" filter="url(#w3)"><path d="M50 34C44 28 56 24 50 16"/></g>
+<g fill="none" stroke="#D97C8C" stroke-width="2" opacity="0.7" filter="url(#w3)"><path d="M66 32C60 26 72 22 66 14"/></g>
+<g transform="translate(2.6 2.8)"><g transform="translate(88 18) scale(0.9)" fill="#EBA1AD" filter="url(#w8)"><path d="M0 4C-7 -2 -3 -8 0 -4C3 -8 7 -2 0 4Z"/></g></g><g transform="translate(88 18) scale(0.9)" fill="none" stroke="#5B3A42" stroke-width="2" filter="url(#w3)"><path d="M0 4C-7 -2 -3 -8 0 -4C3 -8 7 -2 0 4Z"/></g>
+</g>
+</svg>

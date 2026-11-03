@@ -1,56 +1,55 @@
 @import "tailwindcss";
-@import "@fontsource-variable/fraunces";
+@import "@fontsource-variable/caveat";
+@import "@fontsource/patrick-hand";
 
-/* Renkler gönderilen tasarımdaki pudra-gül tonlarından alındı. */
+/*
+ * Renkler gönderilen tasarım görsellerinden ölçüldü; ikon ve çizim renkleri
+ * scripts/draw-art.mjs ile aynı paletten. Tasarım açık tema üzerine kurulu.
+ */
 :root {
-  --bg: #f7eeec;
-  --surface: #fffbfa;
-  --surface-2: #f3e4e3;
-  --fg: #3e2328;
-  --muted: #8a6e72;
-  --accent: #a65666;
+  --bg: #f8edeb;
+  --surface: #fdf8f7;
+  --surface-2: #f4e4e3;
+  --surface-3: #fbefee;
+  --fg: #4a2832;
+  --muted: #8c6f74;
+  --accent: #a96a72;
+  --accent-strong: #9a5560;
   --accent-fg: #ffffff;
-  --line: #ebdcdb;
-  --shadow: rgb(120 60 70 / 0.18);
+  --lavender: #ebe0ea;
+  --lavender-fg: #6f5672;
+  --line: #efdedd;
+  --shadow: rgb(140 80 90 / 0.16);
   --danger: #b3261e;
+  --icon-fill: #f7c6ce;
+  --butter: #f9e2a0;
   color-scheme: light;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #1b1315;
-    --surface: #261b1e;
-    --surface-2: #33242a;
-    --fg: #f3e6e8;
-    --muted: #b79ca2;
-    --accent: #e19aa7;
-    --accent-fg: #2a1519;
-    --line: #3b2a2f;
-    --shadow: rgb(0 0 0 / 0.5);
-    --danger: #f2b8b5;
-    color-scheme: dark;
-  }
 }
 
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
   --color-fg: var(--fg);
   --color-muted: var(--muted);
   --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
   --color-accent-fg: var(--accent-fg);
+  --color-lavender: var(--lavender);
+  --color-lavender-fg: var(--lavender-fg);
   --color-line: var(--line);
   --color-danger: var(--danger);
-  --font-display: "Fraunces Variable", Georgia, "Times New Roman", serif;
-  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  /* Başlıklar: akıcı el yazısı. Kart içleri ve metinler: okunaklı el yazısı. */
+  --font-display: "Caveat Variable", "Bradley Hand", cursive;
+  --font-sans: "Patrick Hand", "Chalkboard SE", "Comic Sans MS", -apple-system, sans-serif;
 }
 
 @utility card {
-  background: var(--surface);
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-3) 100%);
   border: 1px solid var(--line);
-  border-radius: 22px;
-  box-shadow: 0 10px 24px -18px var(--shadow);
+  border-radius: 18px;
+  box-shadow: 0 12px 28px -20px var(--shadow), 0 1px 2px rgb(140 80 90 / 0.06);
 }
 
 html,
@@ -61,6 +60,7 @@ body {
 
 body {
   font-family: var(--font-sans);
+  font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: none;

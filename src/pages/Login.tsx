@@ -1,5 +1,6 @@
-import { Sparkles } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
+import { LogoMark } from '../components/HandIcon'
+import { Art } from '../components/ui'
 import { supabase } from '../lib/supabase'
 
 type Mode = 'giris' | 'kayit'
@@ -49,17 +50,18 @@ export default function Login() {
   }
 
   const inputClass =
-    'w-full rounded-2xl border border-line bg-surface px-4 py-3 text-[16px] text-fg placeholder:text-muted/70 focus:border-accent focus:outline-none'
+    'w-full rounded-2xl border border-line bg-surface px-4 py-3 text-[18px] text-fg placeholder:text-muted/70 focus:border-accent focus:outline-none'
 
   return (
     <div className="flex min-h-dvh flex-col justify-center bg-bg px-5 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
       <div className="mx-auto flex w-full max-w-sm flex-col gap-6">
         <div className="flex flex-col items-center gap-3 text-center">
-          <span className="grid size-16 place-items-center rounded-[20px] bg-accent text-accent-fg shadow-sm">
-            <Sparkles size={32} strokeWidth={1.6} aria-hidden />
-          </span>
-          <h1 className="font-display text-[34px] font-semibold">Asistanım</h1>
-          <p className="text-[15px] text-muted">Görevlerin, takvimin ve listelerin tek yerde</p>
+          <Art name="home-hero" className="w-[78%] max-w-[300px]" />
+          <h1 className="flex items-center gap-2 font-display text-[48px] leading-none font-bold">
+            <LogoMark size={38} />
+            Asistanım
+          </h1>
+          <p className="text-[17px] text-muted">Görevlerin, takvimin ve listelerin tek yerde</p>
         </div>
 
         <div role="tablist" aria-label="Giriş türü" className="card grid grid-cols-2 gap-1 p-1">
@@ -74,7 +76,7 @@ export default function Login() {
                 setError('')
                 setNotice('')
               }}
-              className={`rounded-2xl py-2.5 text-[15px] font-medium ${mode === m ? 'bg-accent text-accent-fg' : 'text-muted'}`}
+              className={`rounded-2xl py-2.5 text-[18px] ${mode === m ? 'bg-accent text-accent-fg' : 'text-muted'}`}
             >
               {m === 'giris' ? 'Giriş yap' : 'Hesap oluştur'}
             </button>
@@ -116,13 +118,13 @@ export default function Login() {
             required
           />
 
-          {error && <p role="alert" className="px-1 text-[14px] text-danger">{error}</p>}
-          {notice && <p role="status" className="rounded-2xl bg-surface-2 px-4 py-3 text-[14px]">{notice}</p>}
+          {error && <p role="alert" className="px-1 text-[16px] text-danger">{error}</p>}
+          {notice && <p role="status" className="rounded-2xl bg-surface-2 px-4 py-3 text-[16px]">{notice}</p>}
 
           <button
             type="submit"
             disabled={busy}
-            className="mt-1 rounded-2xl bg-accent py-3.5 text-[16px] font-semibold text-accent-fg disabled:opacity-60"
+            className="mt-1 rounded-2xl bg-accent py-3 text-[20px] text-accent-fg disabled:opacity-60"
           >
             {busy ? 'Bekle…' : mode === 'giris' ? 'Giriş yap' : 'Hesap oluştur'}
           </button>

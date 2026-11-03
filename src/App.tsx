@@ -10,6 +10,7 @@ import Home from './pages/Home'
 import ListDetail from './pages/ListDetail'
 import Lists from './pages/Lists'
 import Login from './pages/Login'
+import NewPassword from './pages/NewPassword'
 import Profile from './pages/Profile'
 import Tasks from './pages/Tasks'
 
@@ -27,8 +28,9 @@ export default function App() {
 }
 
 function Gate() {
-  const { session, loading } = useAuth()
+  const { session, loading, recovery } = useAuth()
   if (loading) return <Splash />
+  if (recovery && session) return <NewPassword />
   if (!session) return <Login />
 
   return (

@@ -3,7 +3,7 @@ import { LogoMark } from '../components/HandIcon'
 import { Art } from '../components/ui'
 import { supabase } from '../lib/supabase'
 
-type Mode = 'giris' | 'kayit'
+type Mode = 'giris' | 'kayit' | 'sifre'
 
 const ERRORS: [RegExp, string][] = [
   [/invalid login credentials/i, 'E-posta ya da şifre hatalı.'],
@@ -37,6 +37,10 @@ export default function Login() {
     if (mode === 'giris') {
       const { error } = await supabase.auth.signInWithPassword({ email, password })
       if (error) setError(toTurkish(error.message))
+    } else if (mode === 'sifre') {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin })
+      if (error) setError(toTurkish(error.message))
+      else setNotice(`Bu e-postayla bir hesap varsa ${email} adresine şifre yenileme bağlantısı gönderdik. Bağlantıya dokunup yeni şifreni belirle.`)
     } else {
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -64,6 +68,12 @@ export default function Login() {
           <p className="text-[17px] text-muted">Görevlerin, takvimin ve listelerin tek yerde</p>
         </div>
 
+        {mode === 'sifre' ? (
+          <div className="flex flex-col gap-1 text-center">
+            <h2 className="text-[24px]">Şifreni mi unuttun?</h2>
+            <p className="text-[16px] text-muted">E-postanı yaz, yeni şifre belirlemen için bir bağlantı gönderelim.</p>
+          </div>
+        ) : (
         <div role="tablist" aria-label="Giriş türü" className="card grid grid-cols-2 gap-1 p-1">
           {(['giris', 'kayit'] as const).map((m) => (
             <button
@@ -82,6 +92,7 @@ export default function Login() {
             </button>
           ))}
         </div>
+        )}
 
         <form onSubmit={submit} className="flex flex-col gap-3">
           {mode === 'kayit' && (
@@ -106,6 +117,7 @@ export default function Login() {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
+          {mode !== 'sifre' && (
           <input
             id="password"
             type="password"
@@ -117,6 +129,7 @@ export default function Login() {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+          )}
 
           {error && <p role="alert" className="px-1 text-[16px] text-danger">{error}</p>}
           {notice && <p role="status" className="rounded-2xl bg-surface-2 px-4 py-3 text-[16px]">{notice}</p>}
@@ -126,8 +139,22 @@ export default function Login() {
             disabled={busy}
             className="mt-1 rounded-2xl bg-accent py-3 text-[20px] text-accent-fg disabled:opacity-60"
           >
-            {busy ? 'Bekle…' : mode === 'giris' ? 'Giriş yap' : 'Hesap oluştur'}
+            {busy ? 'Bekle…' : mode === 'giris' ? 'Giriş yap' : mode === 'kayit' ? 'Hesap oluştur' : 'Bağlantıyı gönder'}
           </button>
+
+          {mode !== 'kayit' && (
+            <button
+              type="button"
+              onClick={() => {
+                setMode(mode === 'sifre' ? 'giris' : 'sifre')
+                setError('')
+                setNotice('')
+              }}
+              className="self-center py-1 text-[16px] text-accent-strong"
+            >
+              {mode === 'sifre' ? 'Girişe dön' : 'Şifremi unuttum'}
+            </button>
+          )}
         </form>
       </div>
     </div>

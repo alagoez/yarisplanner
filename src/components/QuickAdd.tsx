@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
-import { EditorContext } from '../lib/editor'
+import { EditorContext, type EditorPreset } from '../lib/editor'
 import { hasTime, useItems, type Item, type Kind, type Module, type Repeat } from '../lib/items'
 import { getPushState } from '../lib/push'
 import HandIcon from './HandIcon'
@@ -49,34 +49,34 @@ const timeValue = (d: Date) => `${pad(d.getHours())}:${pad(d.getMinutes())}`
  * kayıtla açılırsa düzenleme, kayıtsız açılırsa yeni kayıt.
  */
 export default function EditorProvider({ children }: { children: ReactNode }) {
-  const [editing, setEditing] = useState<Item | 'new' | null>(null)
+  const [editing, setEditing] = useState<{ item?: Item; preset?: EditorPreset; key: number } | null>(null)
   return (
-    <EditorContext value={{ open: (item) => setEditing(item ?? 'new') }}>
+    <EditorContext value={{ open: (item, preset) => setEditing({ item, preset, key: Date.now() }) }}>
       {children}
       <button
         type="button"
-        onClick={() => setEditing('new')}
+        onClick={() => setEditing({ key: Date.now() })}
         aria-label="Yeni kayıt ekle"
         className="fixed right-4 bottom-[calc(env(safe-area-inset-bottom)+92px)] z-20 grid size-14 place-items-center rounded-full border-[1.5px] border-fg/70 bg-accent text-accent-fg shadow-[0_10px_24px_-10px_var(--accent)]"
       >
         <HandIcon name="plus" size={30} strokeWidth={2.2} fill={false} />
       </button>
-      {editing && <Sheet key={editing === 'new' ? 'new' : editing.id} item={editing === 'new' ? undefined : editing} onClose={() => setEditing(null)} />}
+      {editing && <Sheet key={editing.key} item={editing.item} preset={editing.preset} onClose={() => setEditing(null)} />}
     </EditorContext>
   )
 }
 
-function Sheet({ item, onClose }: { item?: Item; onClose: () => void }) {
+function Sheet({ item, preset, onClose }: { item?: Item; preset?: EditorPreset; onClose: () => void }) {
   const { add, update, remove } = useItems()
   const titleRef = useRef<HTMLInputElement>(null)
   const start = item?.starts_at ? new Date(item.starts_at) : null
   const [title, setTitle] = useState(item?.title ?? '')
-  const [kind, setKind] = useState<Kind>(item?.kind ?? 'gorev')
-  const [module, setModule] = useState<Module>(item?.module ?? 'genel')
+  const [kind, setKind] = useState<Kind>(item?.kind ?? preset?.kind ?? 'gorev')
+  const [module, setModule] = useState<Module>(item?.module ?? preset?.module ?? 'genel')
   const [date, setDate] = useState(() => (item ? (start ? dateValue(start) : '') : dateValue(new Date())))
   const [time, setTime] = useState(item && start && hasTime(item) ? timeValue(start) : '')
-  const [reminders, setReminders] = useState<number[]>(item ? item.reminders.map((r) => r.offset_minutes) : [0])
-  const [repeat, setRepeat] = useState<Repeat | null>(item?.repeat ?? null)
+  const [reminders, setReminders] = useState<number[]>(item ? item.reminders.map((r) => r.offset_minutes) : (preset?.reminders ?? [0]))
+  const [repeat, setRepeat] = useState<Repeat | null>(item?.repeat ?? preset?.repeat ?? null)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')

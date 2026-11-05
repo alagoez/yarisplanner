@@ -15,6 +15,16 @@ export function addDays(date: Date, days: number) {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate() + days)
 }
 
+export function addMonths(date: Date, months: number) {
+  return new Date(date.getFullYear(), date.getMonth() + months, 1)
+}
+
+/** Ay görünümü için 6 haftalık ızgara: ayın ilk gününün haftasının Pazartesisinden başlar. */
+export function monthGrid(date: Date) {
+  const start = weekOf(new Date(date.getFullYear(), date.getMonth(), 1))[0]
+  return Array.from({ length: 42 }, (_, i) => addDays(start, i))
+}
+
 export function isSameDay(a: Date, b: Date) {
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
 }

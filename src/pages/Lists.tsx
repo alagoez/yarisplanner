@@ -2,22 +2,25 @@ import { Link } from 'react-router'
 import HandIcon, { type IconName } from '../components/HandIcon'
 import PageHeader from '../components/PageHeader'
 import { Art, CardHeading, EditTitle, Muted, SeeAll, Timeline, TimelineRow, Twinkle } from '../components/ui'
-import { useExtras } from '../lib/demo'
 import { formatLong, formatShort, hasTime, splitRoute, upcoming, useItems } from '../lib/items'
 import { useNow } from '../lib/useNow'
-import { LISTS } from '../lib/lists'
+import { itemsOf, LISTS, useLists } from '../lib/lists'
 
 export default function Lists() {
-  const extras = useExtras()
+  const { listItems } = useLists()
+  const open = (slug: string) => itemsOf(listItems, slug).filter((i) => !i.done_at).length
   const { items } = useItems()
   const next = upcoming(items, useNow())
   const care = next.filter((i) => i.module === 'bakim' && hasTime(i)).slice(0, 3)
   const trip = next.find((i) => i.kind === 'seyahat')
   const route = trip ? splitRoute(trip.title) : null
   const counts: Record<string, string> = {
-    alinacaklar: extras.shoppingCount > 0 ? `${extras.shoppingCount} ürün` : 'Liste boş',
-    filmler: extras.movies > 0 ? `İzlenecekler listesi · ${extras.movies} film` : 'İzlenecekler listesi',
-    hedefler: extras.goals > 0 ? `Bu ay için · ${extras.goals} hedef` : 'Bu ay için hedef yok',
+    alinacaklar: open('alinacaklar') > 0 ? `${open('alinacaklar')} ürün` : 'Liste boş',
+    filmler: open('filmler') > 0 ? `İzlenecekler listesi · ${open('filmler')} film` : 'İzlenecekler listesi',
+    kitaplar: open('kitaplar') > 0 ? `Okunacaklar · ${open('kitaplar')} kitap` : 'Okunacaklar listesi',
+    hedefler: open('hedefler') > 0 ? `${open('hedefler')} hedef` : 'Henüz hedef yok',
+    'istek-listesi': open('istek-listesi') > 0 ? `${open('istek-listesi')} ürün` : 'Almak istediğin şeyler',
+    projeler: open('projeler') > 0 ? `${open('projeler')} aktif proje` : 'Okul ve iş projelerin',
   }
 
   return (

@@ -142,6 +142,7 @@ const ICONS = {
   },
   info: { d: ['M12.3 3.6C16.9 3.7 20.5 7.4 20.4 12C20.3 16.7 16.6 20.4 12 20.4C7.3 20.4 3.6 16.6 3.6 11.9C3.7 7.5 7.2 3.8 11.6 3.6', 'M12 11V16.4', 'M12 7.9h.01'] },
   tick: { d: ['M5.5 12.6L9.6 16.5L18.6 7.2'] },
+  close: { d: ['M6.5 6.4C10 9.9 14 13.9 17.6 17.5', 'M17.5 6.5C14 10 10 14 6.4 17.6'] },
 } satisfies Record<string, IconDef>
 
 export type IconName = keyof typeof ICONS

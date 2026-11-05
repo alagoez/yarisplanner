@@ -7,13 +7,13 @@ import { Art, CardHeading, CheckBox, EditTitle, IconChip, Muted, SeeAll, Timelin
 import WeekStrip from '../components/WeekStrip'
 import { firstName, useAuth } from '../lib/auth-context'
 import { greeting } from '../lib/dates'
-import { useExtras } from '../lib/demo'
+import { dayKey, itemsOf, useLists } from '../lib/lists'
 import { formatLong, formatTime, hasTime, isDone, isTask, onDay, openTasks, splitRoute, upcoming, useItems, type Item } from '../lib/items'
 import { useNow } from '../lib/useNow'
 
 export default function Home() {
   const { session } = useAuth()
-  const extras = useExtras()
+  const { meals, listItems } = useLists()
   const { items, toggleDone } = useItems()
   const now = useNow()
   const name = firstName(session)
@@ -28,6 +28,7 @@ export default function Home() {
   const taskCount = today.filter((i) => isTask(i) && !isDone(i)).length
   const reminders = today.reduce((n, i) => n + (isDone(i) ? 0 : i.reminders.length), 0)
   const countIn = (module: Item['module']) => next.filter((i) => i.module === module).length
+  const shoppingCount = itemsOf(listItems, 'alinacaklar').filter((i) => !i.done_at).length
 
   return (
     <>
@@ -106,13 +107,13 @@ export default function Home() {
         <Tile to="/takvim" icon="gradCap" title="Okul" subtitle={count(countIn('okul'), 'kayıt')} art="books-cap" artHeight={58} tone="lavender" />
 
         <Tile to="/listeler/aksam-yemegi" icon="utensils" title="Akşam Yemeği" subtitle="Bugünün menüsü" art="plate" artHeight={62}>
-          <p className="mt-2 text-[15px] leading-snug text-fg">{extras.dinnerToday ?? 'Henüz menü eklenmedi.'}</p>
+          <p className="mt-2 text-[15px] leading-snug text-fg">{meals.find((m) => m.day === dayKey(now))?.meal ?? 'Henüz menü eklenmedi.'}</p>
         </Tile>
         <Tile
           to="/listeler/alinacaklar"
           icon="cart"
           title="Alışveriş"
-          subtitle={extras.shoppingCount > 0 ? `${extras.shoppingCount} ürün` : 'Liste boş'}
+          subtitle={shoppingCount > 0 ? `${shoppingCount} ürün` : 'Liste boş'}
           art="bag"
           artHeight={96}
         />
